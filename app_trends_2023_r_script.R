@@ -1,9 +1,7 @@
 install.packages("tidyverse")
 install.packages("skimr")
-install.packages("kableExtra")
 library(tidyverse)
 library(skimr)
-library(kableExtra)
 
 # importing data
 app_trends <- read_csv("app_trends_2023.csv")
@@ -189,16 +187,4 @@ write.csv(median_appointment_times, file = paste("project_results/average_appoin
 image_path <- file.path("project_results", paste("bar_plot_average_appointment_times_", formatted_date_range, ".png", sep = ""))
 # Save the bar plot as a high quality image w/ year info in title
 ggsave(filename = image_path, plot = bar_plot, width = 10, height = 6, dpi = 400, bg = "white")
-
-# Export median_appointment_times as an image w/ year info in title
-webshot::install_phantomjs()
-
-formatted_table <- median_appointment_times %>%
-  mutate(across(starts_with("20"), ~ paste0(round(.), " min"), .names = "new_{.col}"))
-
-table_image_path <- file.path("project_results", paste("average_appointment_times_", formatted_date_range, ".png", sep = ""))
-
-kable(formatted_table, "html") %>%
-  kable_styling() %>%
-  as_image(file = table_image_path)
 
