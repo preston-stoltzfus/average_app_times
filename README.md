@@ -2,7 +2,7 @@ Data Analysist:	Preston Stoltzfus
 
 Problem: Technician suporvisor feels that certain "technician appointments" are taking longer then the scheduled amount of time.
 	
-Goal: Identify how long the "diabetic consult" times take for technician appontments. Management is also curious about appointment lengths in general and how they can vary from each location (they have 3).
+Goal: Identify how long the "diabetic consult" times take for technician appointments. Management is also curious about appointment lengths in general and how they can vary from each location (they have 3).
 
 Privacy: Clients names have been removed
 
