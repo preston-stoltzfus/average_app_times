@@ -83,7 +83,7 @@ s_app_trends <- s_app_trends %>%
 
 # creating data in "app_type" column
 
-# adding data to the new app_type. I have 6 different categories to make, doctor, tech_app, admit, other, doctor/admit, and na.
+# adding data to the new app_type. I have 6 different categories to make; doctor, tech_app, admit, other, doctor/admit, and na.
 s_app_trends <- s_app_trends %>%
   mutate(app_type = case_when(
     description %in% c("acupuncture", "behavior consultation", "emergency", "euthanasia", "exotic exam", "new client", 
@@ -105,7 +105,7 @@ s_app_trends$app_type <- ifelse(is.na(s_app_trends$app_type) & s_app_trends$staf
                                 ifelse(is.na(s_app_trends$app_type), "doctor/admit", s_app_trends$app_type))
 
 # creating data in "app_subtype" column. Really I just need to asses which appointments are diabetic consults, 
-# unfortunately it's not scheduled the same way and some are doctor appointments we we need to select out just
+# unfortunately it's not scheduled the same way all the time and some are doctor appointments we we need to select out just
 # the tech appointment diabetic consults. 
 
 # creating "diabetic consult" in "app_subtype" only if it's a tech_app
@@ -118,14 +118,6 @@ s_app_trends <- s_app_trends %>%
       "diabetic consult",
       app_subtype)
      )
-
-
-# analysis and visuals begin
-
-# Calculate the date range from now to 2 years ago
-current_year <- year(Sys.Date())
-date_range_start <- as.Date(paste0(current_year - 2, "-01-01"))
-date_range_end <- Sys.Date()
 
 # create a column called "details". This is so we can categorize things (in particular tech appointments) in a clearer more
 # error free way. I am also selecting out the only appointment types that are needed for analysis
@@ -141,7 +133,10 @@ s_app_trends <- s_app_trends %>%
   )) %>%
   select(-details_placeholder)  # Remove the placeholder column
 
-# Create a new data frame for the results. Using median to protect from large outliers that exist in data. 
+
+# analysis and visuals begin
+
+# Finding the average duraiton. Create a new data frame for the results. Using median to protect from large outliers that exist in data. 
 median_appointment_times <- s_app_trends %>%
   filter(!is.na(details)) %>%  # Exclude rows with NA in details column
   mutate(location_column = location) %>%
@@ -149,11 +144,15 @@ median_appointment_times <- s_app_trends %>%
   summarise(median_duration = median(duration_min)) %>%
   pivot_wider(names_from = location_column, values_from = median_duration)
 
-
 # Melt the data for plotting
 melted_data <- median_appointment_times %>%
   gather(location, average_time, mpv:met) %>%
   filter(!is.na(average_time))  # Exclude NA values
+
+# Calculate the date range from now to 2 years ago
+current_year <- year(Sys.Date())
+date_range_start <- as.Date(paste0(current_year - 2, "-01-01"))
+date_range_end <- Sys.Date()
 
 # Format the date range for the file names
 formatted_date_range <- paste(format(date_range_start, "%Y"), format(date_range_end, "%Y"), sep = "-")
@@ -190,7 +189,6 @@ write.csv(median_appointment_times, file = paste("project_results/average_appoin
 image_path <- file.path("project_results", paste("bar_plot_average_appointment_times_", formatted_date_range, ".png", sep = ""))
 # Save the bar plot as a high quality image w/ year info in title
 ggsave(filename = image_path, plot = bar_plot, width = 10, height = 6, dpi = 400, bg = "white")
-
 
 # Export median_appointment_times as an image w/ year info in title
 webshot::install_phantomjs()
